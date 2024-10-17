@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 
 use http_body_util::Full;
 use hyper::body::Bytes;
-use hyper::server::conn::http2;
+use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
 use tokio::net::TcpListener;
@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     pretty_env_logger::init();
 
     // This address is localhost
-    let addr = SocketAddr::from(([127, 0, 0, 1], 80));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8888));
 
     // Bind to the port and listen for incoming TCP connections
     let listener = TcpListener::bind(addr).await?;
@@ -59,10 +59,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // has work to do. In this case, a connection arrives on the port we are listening on and
         // the task is woken up, at which point the task is then put back on a thread, and is
         // driven forward by the runtime, eventually yielding a TCP stream.
-        let (stream, _) = listener.accept().await?;
+        let (tcp, _) = listener.accept().await?;
         // Use an adapter to access something implementing `tokio::io` traits as if they implement
         // `hyper::rt` IO traits.
-        let io = TokioIo::new(stream);
+        let io = TokioIo::new(tcp);
 
         // Spin up a new task in Tokio so we can continue to listen for new TCP connection on the
         // current task without waiting for the processing of the HTTP/2 connection we just received
@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         tokio::task::spawn(async move {
             // Handle the connection from the client using HTTP/2 with an executor and pass any
             // HTTP requests received on that connection to the `hello` function
-            if let Err(err) = http2::Builder::new(TokioExecutor)
+            if let Err(err) = http1::Builder::new()
                 .serve_connection(io, service_fn(hello))
                 .await
             {
