@@ -4,9 +4,9 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 
 
-//use http_body_util::Full;
+use http_body_util::Full;
 use hyper::body::Bytes;
-use http_body_util::{combinators::BoxBody};
+//use http_body_util::{combinators::BoxBody};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
@@ -29,12 +29,12 @@ use support::TokioIo;
 //    Ok(Response::new(Full::new(Bytes::from("0"))))
 //}
 
-async fn hello(_req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, Infallible>>, hyper::Error> {
+async fn hello(_req: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
     let response = Response::builder()
         .status(StatusCode::UNAUTHORIZED)
-        .body("not")
+        .body(Full::new(Bytes::from("0")))
         .unwrap();
-
+    
     Ok(response)
 }
 
