@@ -5,12 +5,13 @@ use std::net::SocketAddr;
 
 
 //use http_body_util::Full;
-//use hyper::body::Bytes;
+use hyper::body::Bytes;
+use http_body_util::{combinators::BoxBody};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
 use tokio::net::TcpListener;
-use hyper::{StatusCode,Body};
+use hyper::{StatusCode};
 
 // This would normally come from the `hyper-util` crate, but we can't depend
 // on that here because it would be a cyclical dependency.
@@ -28,7 +29,7 @@ use support::TokioIo;
 //    Ok(Response::new(Full::new(Bytes::from("0"))))
 //}
 
-async fn hello(_req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn hello(_req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, Infallible>>, hyper::Error> {
     let response = Response::builder()
         .status(StatusCode::UNAUTHORIZED)
         .body(Body::from("Unauthorized"))
