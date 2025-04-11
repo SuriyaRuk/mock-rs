@@ -3,12 +3,14 @@
 use std::convert::Infallible;
 use std::net::SocketAddr;
 
+
 use http_body_util::Full;
 use hyper::body::Bytes;
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
 use tokio::net::TcpListener;
+use hyper::{Body, Request, Response, Server, StatusCode};
 
 // This would normally come from the `hyper-util` crate, but we can't depend
 // on that here because it would be a cyclical dependency.
@@ -18,9 +20,23 @@ use support::TokioIo;
 
 // An async function that consumes a request, does nothing with it and returns a
 // response.
-async fn hello(_: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
-    Ok(Response::new(Full::new(Bytes::from("0"))))
+//async fn hello(_: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//    Ok(Response::new(Full::new(Bytes::from("0"))))
+//}
+
+//async fn hello(_: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//    Ok(Response::new(Full::new(Bytes::from("0"))))
+//}
+
+async fn hello(_req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let response = Response::builder()
+        .status(StatusCode::UNAUTHORIZED)
+        .body(Body::from("Unauthorized"))
+        .unwrap();
+
+    Ok(response)
 }
+
 
 #[derive(Clone)]
 // An Executor that uses the tokio runtime.
