@@ -10,7 +10,7 @@ use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
 use tokio::net::TcpListener;
-use hyper::{Body, StatusCode};
+use hyper::{StatusCode};
 
 // This would normally come from the `hyper-util` crate, but we can't depend
 // on that here because it would be a cyclical dependency.
