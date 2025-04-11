@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 
 //use http_body_util::Full;
 use hyper::body::Bytes;
-use http_body_util::{combinators::BoxBody};
+use http_body_util::{combinators::BoxBody,Full};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Request, Response};
@@ -28,11 +28,11 @@ use support::TokioIo;
 //async fn hello(_: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
 //    Ok(Response::new(Full::new(Bytes::from("0"))))
 //}
-
+static MISSING: &[u8] = b"Missing field";
 async fn hello(_req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, Infallible>>, hyper::Error> {
     let response = Response::builder()
         .status(StatusCode::UNAUTHORIZED)
-        .body(Body::from("Unauthorized"))
+        .body(full(MISSING))
         .unwrap();
 
     Ok(response)
